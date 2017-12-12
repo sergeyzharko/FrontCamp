@@ -1,0 +1,27 @@
+.source {
+    cursor: pointer;
+    width: 150px;
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+}
+
+.source-image {
+    height: 140px;
+    width: 150px;
+}
+
+.news-image {
+    height: 200px;
+}
+
+.article {
+    width: 50%;
+    margin-top: 20px;
+    padding: 5px;
+    border: solid gray 3px;
+}
+
+.selected {
+    border: solid green 3px;
+}
