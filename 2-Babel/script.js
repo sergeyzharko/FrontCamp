@@ -28,20 +28,30 @@ fetch(req)
 })
 
 
+// Async/Await - задание со звёздочкой
+async function readSourceArray(){
+    return await sources;
+}
+
+
 
 function loadSources() {
     let buttons = document.querySelector('.buttons');
 
-    sources.forEach( source => {
-        let button = document.createElement('div');
-        button.classList.add('source');
-        button.classList.add(source.link);
-        button.innerHTML = `
-            <img class="source-image" src="${source.logo}" alt="${source.name}">
-            <a href="#"><div class="picture lion"></div></a>`;
-        button.addEventListener('click', () => loadNews(source.link) );
-        buttons.appendChild(button);
-    });
+    readSourceArray().then(
+        (sources => {
+            sources.forEach( source => {
+                let button = document.createElement('div');
+                button.classList.add('source');
+                button.classList.add(source.link);
+                button.innerHTML = `
+                    <img class="source-image" src="${source.logo}" alt="${source.name}">
+                    <a href="#"><div class="picture lion"></div></a>`;
+                button.addEventListener('click', () => loadNews(source.link) );
+                buttons.appendChild(button);
+            });
+        }) 
+    )
 }
 
 document.addEventListener("DOMContentLoaded", loadSources);
