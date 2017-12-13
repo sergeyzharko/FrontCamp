@@ -18,9 +18,7 @@ var url = 'https://newsapi.org/v2/sources?' + 'apiKey=f53b56a81c57478689c3058487
 
 var req = new Request(url);
 
-fetch(req).then(function (response) {
-    console.log(response.json());
-});
+fetch(req).then(function (response) {});
 
 function loadSources() {
     var buttons = document.querySelector('.buttons');
