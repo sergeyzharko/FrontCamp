@@ -28,36 +28,40 @@ fetch(req)
 })
 
 
+// Async/Await - задание со звёздочкой
+async function readSourceArray(){
+    return await sources;
+}
+
+
 
 function loadSources() {
     let buttons = document.querySelector('.buttons');
 
-    for (let source of sources) {
-        let button = document.createElement('div');
-        button.classList.add('source');
-        button.classList.add(source.link);
-        button.innerHTML = `
-            <img class="source-image" src="${source.logo}" alt="${source.name}">
-            <a href="#"><div class="picture lion"></div></a>`;
-        button.addEventListener('click', function(){ loadNews(source.link) });
-        buttons.appendChild(button);
-    }
+    readSourceArray().then(
+        (sources => {
+            sources.forEach( source => {
+                let button = document.createElement('div');
+                button.classList.add('source');
+                button.classList.add(source.link);
+                button.innerHTML = `
+                    <img class="source-image" src="${source.logo}" alt="${source.name}">
+                    <a href="#"><div class="picture lion"></div></a>`;
+                button.addEventListener('click', () => loadNews(source.link) );
+                buttons.appendChild(button);
+            });
+        }) 
+    )
 }
 
 document.addEventListener("DOMContentLoaded", loadSources);
 
 
 function loadNews(link) {
-    document.querySelectorAll('.source').forEach(function(element, index){
-        element.classList.remove('selected');
-    });
-
+    document.querySelectorAll('.source').forEach( (element, index) => element.classList.remove('selected') );
     document.querySelector(`.${link}`).classList.add('selected');
-
     var url = `https://newsapi.org/v2/top-headlines?sourceS=${link}&apiKey=f53b56a81c57478689c3058487c41269`;
-
     var req = new Request(url);
-
     fetch(req)
     .then( response => response.json() )
     .then( response => renderNews(response.articles) )
@@ -66,7 +70,7 @@ function loadNews(link) {
 function renderNews(articles) {
     let items = document.querySelector('.news');
     items.innerHTML = '';
-    for (let article of articles) {
+    articles.forEach( article => {
         let dateTime = new Date(article.publishedAt);
         let dateTimeRow = `${dateTime.getFullYear()}.${dateTime.getMonth()}.${dateTime.getDay()} ${dateTime.getHours()}:${dateTime.getMinutes()}`;
         let item = document.createElement('div');
@@ -78,5 +82,5 @@ function renderNews(articles) {
             <p>${article.description}</p>
             <p>Published: ${dateTimeRow}</p>`;
         items.appendChild(item);  
-    }
+    });
 }
