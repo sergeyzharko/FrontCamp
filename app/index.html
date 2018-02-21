@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title><%= htmlWebpackPlugin.options.title %></title>
+        <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@6/promise.min.js"></script> <!-- https://github.com/stefanpenner/es6-promise -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.min.js"></script> <!-- https://github.com/github/fetch -->
+    </head>
+    <body>
+        <h3>Welcome to the Awesome application</h3>
+        <div>
+            <div style='display:inline-block;padding:10px;'>
+                <img id="home" height='75px' width='75px' src='images/home.png' /> 
+            </div>
+            <div class="settingIcon"></div>
+        </div>
+        <div class="buttons"></div>
+        <div class="news"></div>
+    </body>
+    <img id="frontImg" style="height: 400px; width:600px;" src='images/nature.png' />
+</html>

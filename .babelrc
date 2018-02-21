@@ -1,6 +1,6 @@
 {
   "presets": ["env"],
   "plugins": [
-    "./plugin.js"
+    // "./app/scripts/plugin.js"
   ]
 }
