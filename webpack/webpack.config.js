@@ -140,7 +140,7 @@ module.exports = (env = {}) => {
             new CopyWebpackPlugin([ //  копирование файлов из начальной папки в конечную
                 {from:'images',to:'images'} //, {from:'assets',to:'assets'} 
             ]),
-            new webpack.NoErrorsPlugin(), // при ошибке отменять сборку
+            new webpack.NoEmitOnErrorsPlugin(), // при ошибке отменять сборку
             new filelist()
         ]
     }
