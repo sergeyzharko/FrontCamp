@@ -1,0 +1,22 @@
+[  
+    {  
+       "name":"Google News",
+       "logo":"images/GoogleNews.png",
+       "link":"google-news-ru"
+    },
+    {  
+       "name":"BBC News",
+       "logo":"images/BbcNews.png",
+       "link":"bbc-news"
+    },
+    {  
+       "0":"0",
+       "logo":"images/BbcNews.png",
+       "link":"bbc-news"
+    },
+    {  
+       "name":"РБК",
+       "logo":"images/RBK.png",
+       "link":"rbc"
+    }
+ ]
