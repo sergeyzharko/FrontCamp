@@ -33,5 +33,5 @@ News key: f53b56a81c57478689c3058487c41269
         db.restaurants.explain().find({ borough: "Staten Island", name: "Bagel Land" })
         db.restaurants.explain().find({ borough: "Queens", cuisine: "Pizza" })
     4.5.
-        db.restaurants.createIndex({ "name" }, { partialFilterExpression: { "grades.score": { $lt: 7 } }})
+        db.restaurants.createIndex({ "grades.score": 1 }, { partialFilterExpression: { "grades.score": { $lt: 7 } }})
         db.restaurants.explain().find({ "grades.8.score" : { $lt: 7 } }, { name: 1, _id: 0 })
