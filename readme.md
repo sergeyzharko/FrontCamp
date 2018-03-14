@@ -2,7 +2,7 @@ News key: f53b56a81c57478689c3058487c41269
 Запуск babel: babel script.js --out-file script-compiled.js
 Запуск webpack: npm run dev / npm run build
 
-5. MongoDB
+5. MongoDB-1
     3.1. db.restaurants.find({borough: "Queens", cuisine: "Chinese"}).count() // 728
     3.2. db.restaurants.aggregate([{ $unwind:"$grades"}, {$sort: {"_id": -1, "grades.score": -1}}, {"$group": {"_id": "$_id", "score": {"$first": "$grades.score"}}}, {$sort: {"score": -1}}, {$limit: 1}, {"$group": {"_id": "$_id"}}])
     3.3. db.restaurants.updateMany({borough: "Manhattan"}, { $push: { grades: { date: ISODate(), grade: "A", score: 7 } } })
@@ -33,5 +33,110 @@ News key: f53b56a81c57478689c3058487c41269
         db.restaurants.explain().find({ borough: "Staten Island", name: "Bagel Land" })
         db.restaurants.explain().find({ borough: "Queens", cuisine: "Pizza" })
     4.5.
-        db.restaurants.createIndex({ "grades.score": 1 }, { partialFilterExpression: { "grades.score": { $lt: 7 } }})
+        db.restaurants.createIndex({ "grades.score": 1, "name": 1 }, { partialFilterExpression: { "grades.score": { $lt: 7 } }})
         db.restaurants.explain().find({ "grades.8.score" : { $lt: 7 } }, { name: 1, _id: 0 })
+
+5. MongoDB-2
+
+    1.
+db.airlines.aggregate([{
+    $group: {
+        _id: "$class",
+        total: { $sum: 1 }
+	}
+}])
+
+    2.
+db.airlines.aggregate([
+    {
+        $match: {
+            destCountry : {$ne: "United States"}
+	    }
+    },
+    {
+        $group: { _id: "$destCity", avgPassengers: { $avg: "$passengers" } }
+    },
+    {
+        $sort: {
+            avgPassangers: -1
+		}
+	},
+    {
+        $limit: 3
+	}
+])
+
+    3.
+db.airlines.aggregate([
+    {
+        $match: {
+            destCountry : {$eq: "Latvia"}
+	    }
+    },
+    {
+        $group: { _id: "$destCountry", carriers: { $push: "$carrier" } }
+    }
+])
+
+    4.
+db.airlines.aggregate([
+    {
+        $match: {
+            originCountry : {$eq: "United States"},
+            destCountry : { $in: [ "Greece", "Italy", "Spain" ] }
+	    }
+    },
+    {
+        $group: { _id: "$carrier", total: { $sum: "$passengers" } }
+    },
+    {
+        $sort: {
+            total: -1
+		}
+	},
+    {
+        $limit: 10
+	},
+    {
+        $skip: 3
+    }
+])
+
+    5.
+db.airlines.aggregate([
+    {
+        $match: {
+            originCountry : {$eq: "United States"}
+	    }
+    },
+    {
+        $sort: {
+            originState: -1
+		}
+	},
+    {
+        $group: { totalPassengers: { $sum: "$passengers" }, _id: { state: "$originState", city: "$originCity" } }
+    },
+    {
+        $sort: {
+            totalPassengers: -1
+		}
+	},
+    {
+        $group: {
+            _id: "$_id.state",
+            totalPassengers: {$first: "$totalPassengers"},
+            state: {$first: "$_id.state"},
+            city: {$first: "$_id.city"}
+        }
+    },
+    {
+        $sort: {
+            "_id.state": 1
+		}
+	},
+    {
+        $limit: 5
+	},
+    { $project : { _id: 0, totalPassengers : 1 , location: { state : "$state", city: "$city" } } }
+])
