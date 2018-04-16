@@ -1,21 +1,14 @@
 import './sharedModule';
 import forEach from './nodeListForEach';
 forEach();
-import loadSources from './sources';
+import sources from './sources';
 import * as _ from 'lodash';
 import '../styles/style.css';
 import '../styles/appStyles.scss';
-// import homeIcon from '../images/home.png';
-// import natureImg from '../images/nature.jpg';
 
 function loadRes(){
-    // var homeImg = document.getElementById('home');
-    // homeImg.src = homeIcon;
-    
-    // var frontImg = document.getElementById('frontImg');
-    // frontImg.src = natureImg;
-
-    loadSources();
+    var src = new sources();
+    src.loadSources().then( () => src.renderSources() );
 }
 
 
@@ -23,6 +16,7 @@ function loadRes(){
 
 document.addEventListener("DOMContentLoaded", loadRes);
 
+// Additional task:
 var arr=[ 1, 2, 3];
 _.each(arr,function(val) {
  console.log('Output from Lodash _.each for Element ' + val); 

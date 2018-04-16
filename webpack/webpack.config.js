@@ -7,21 +7,22 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const package = require('../package.json');
 const filelist = require('./filelist.js');
 const customLoader = require('./customLoader.js');
+var isProd;
 
 module.exports = (env = {}) => {
-    const isProd = env === 'prod';
-    return {
-        context: path.resolve(__dirname,"../app"), // __dirname - текущая папка, корневой модуль
+    isProd = env === 'prod';
+    let ret = {
+        context: path.resolve(__dirname,"../app"), // __dirname - текущая папка, корневой модуль, используется для entry
         entry: {
             babel_polyfill: 'babel-polyfill', // name: path, to get async/await working
             main: "./scripts/main",
-            vendor: Object.keys(package.dependencies),
+            vendor: Object.keys(package.dependencies), // подключение библиотек из package.json -> dependencies
             settings: "./scripts/settings"
         }, // корневой элемент
         output: {
             path: path.resolve(__dirname,"../dist"), // все сформированные ассеты
             //publicPath: 'dist/',
-            filename: "[name].bundle.js",
+            filename: "[name].bundle.js", // вместо name будут подставлены названия из entry
             chunkFilename: '[name].bundle.js'
         },
         resolve: {
@@ -114,10 +115,10 @@ module.exports = (env = {}) => {
             ignored: /node_modules/
         },
         plugins: [
-            new webpack.DefinePlugin({
-                ENVIRONMENT: 'development'
-            }),
-            new webpack.optimize.CommonsChunkPlugin({ // общие для всез модули
+            // new webpack.EnvironmentPlugin({
+            //     ENVIRONMENT: 'development'
+            // }),
+            new webpack.optimize.CommonsChunkPlugin({ // общие для всех модули. Выделяет общий код в отдельный файл.
                 name: 'shared', // new file-name
                 minChunks: Infinity // create a chunk if the module is found to be shared in at-least two other files/modules
             }),
@@ -139,8 +140,30 @@ module.exports = (env = {}) => {
             new CopyWebpackPlugin([ //  копирование файлов из начальной папки в конечную
                 {from:'images',to:'images'} //, {from:'assets',to:'assets'} 
             ]),
-            new webpack.HotModuleReplacementPlugin(),
+            new webpack.NoEmitOnErrorsPlugin(), // при ошибке отменять сборку
             new filelist()
         ]
     }
+
+    if (isProd) {
+        ret.plugins.push(
+            new webpack.optimize.UglifyJsPlugin({
+              compress: {
+                // don't show unreachable variables etc
+                warnings:     false,
+                drop_console: true,
+                unsafe:       true
+              }
+            })
+        );
+    }
+    
+    if (!isProd) {
+        ret.plugins.push(
+            new webpack.HotModuleReplacementPlugin()
+        );
+    }
+
+    return ret;
 }
+
