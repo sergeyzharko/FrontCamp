@@ -179,3 +179,7 @@ sudo npm install -g nodemon --save
 
 node app
 nodemon app
+
+npm install winston --save
+npm install express-error-handler --save
+npm install pug --save
