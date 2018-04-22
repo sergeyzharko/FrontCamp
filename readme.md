@@ -172,7 +172,7 @@ db.enron.aggregate([
 
 
 
-6. Node.js
+6. Node.js - 1
 
 npm install express --save
 sudo npm install -g nodemon --save
@@ -183,3 +183,9 @@ nodemon app
 npm install winston --save
 npm install express-error-handler --save
 npm install pug --save
+
+
+7. Node.js - 2
+
+npm install mongodb --save
+npm install mongoose --save

@@ -4,6 +4,25 @@ var articles = require('./articles');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var logger = require('./config/winston');
+var mongoose = require('mongoose');
+
+mongoose.connect('mongodb://127.0.0.1/blogs');
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() { console.log('Database has been connected!') });
+
+var Schema = mongoose.Schema;
+
+var blogSchema = new Schema({
+  id: Number,
+	title: String,
+	author: String,
+	body: { type: String, required: [true, 'Where is the body?']},
+	date: { type: Date, default: Date.now }
+});
+
+var Article = db.model('Article', blogSchema);
 
 // let articles = [{ id: 1, name: 'Article', body: 'Hello' }];
 
@@ -21,16 +40,35 @@ http.createServer(app).listen(app.get('port'), function(){
 // Middleware
 
 app.get('/blogs', function (req, res, next) {
+
+  app.get('/blogs', function (req, res) {
+    Article.find(function (err, blogs) {
+      if (err) return console.error(err);
+      console.log(blogs);
+    })
+  })
+
   let num = req.query['id'];
   if (num) {
     // http://localhost:3000/blogs/?id=0
-    console.log(num);
-    // res.end(JSON.stringify(articles[num]));
-    res.json(articles[num]);
+    
+    // res.json(articles[num]);
+
+    Article.find({ id: num }, function (err, blogs) {
+      if (err) return console.error(err);
+      res.json(blogs);
+    })
+
   } else {
     logger.info('blogs');
-    // res.end(JSON.stringify(articles));
-    res.json(articles);
+    
+    // res.json(articles);
+
+    Article.find(function (err, blogs) {
+      if (err) return console.error(err);
+      res.json(blogs);
+    })
+
   }
 });
 
@@ -65,71 +103,112 @@ app.get('/view', function (req, res) {
 
 app.post('/blogs', function (req, res) {
   const blogs = req.body;
-  
-  // articles.push(JSON.parse(blogs));
-  articles.push(blogs);
-  console.log(JSON.stringify(articles));
-  fs.truncate("./node/articles.json", 0, function() {
-    fs.writeFile("./node/articles.json", JSON.stringify(articles), function (err) {
-        if (err) {
-            return console.log("Error writing file: " + err);
-        }
-        res.status(204).send();
-        console.log('Done');
-    });
+
+  // articles.push(blogs);
+  // console.log(JSON.stringify(articles));
+  // fs.truncate("./node/articles.json", 0, function() {
+  //   fs.writeFile("./node/articles.json", JSON.stringify(articles), function (err) {
+  //       if (err) {
+  //           return console.log("Error writing file: " + err);
+  //       }
+  //       res.status(204).send();
+  //       console.log('Done');
+  //   });
+  // });
+
+
+  var article = new Article(blogs);
+  article.save(function (err, article) {
+    if (err) return console.error("Error writing: " + err);
+    next(new Error("Error writing: " + err)); // Express regards the current request as being an error
   });
+  res.status(204).send();
+  console.log('Done');
+
 });
 
 app.put('/blogs', function (req, res) {
   const blogs = req.body;
   let num = req.query['id'];
   
-  articles[num] = blogs;
-  console.log(JSON.stringify(articles));
-  fs.truncate("./node/articles.json", 0, function() {
-    fs.writeFile("./node/articles.json", JSON.stringify(articles), function (err) {
-        if (err) {
-            return console.log("Error writing file: " + err);
-        }
-        res.status(204).send();
-        console.log('Done');
-    });
+  // articles[num] = blogs;
+  // console.log(JSON.stringify(articles));
+  // fs.truncate("./node/articles.json", 0, function() {
+  //   fs.writeFile("./node/articles.json", JSON.stringify(articles), function (err) {
+  //       if (err) {
+  //           return console.log("Error writing file: " + err);
+  //       }
+  //       res.status(204).send();
+  //       console.log('Done');
+  //   });
+  // });
+
+  var article = new Article(blogs);
+  var submission = {};
+  submission.id = article.id;
+  submission.title = article.title;
+  submission.author = article.author;
+  submission.body = article.body;
+  submission.date = article.date;
+  Article.findOneAndUpdate({ id: num }, submission, function (err, article) {
+    if (err) return console.error(err);
   });
+
 });
 
 app.delete('/blogs', function (req, res) {
   let num = req.query['id'];
-  test.splice(test.indexOf(num), 1);
-  console.log(JSON.stringify(articles));
-  fs.truncate("./node/articles.json", 0, function() {
-    fs.writeFile("./node/articles.json", JSON.stringify(articles), function (err) {
-        if (err) {
-            return console.log("Error writing file: " + err);
-        }
-        res.status(204).send();
-        console.log('Done');
-    });
-  });
+
+  // test.splice(test.indexOf(num), 1);
+  // console.log(JSON.stringify(articles));
+  // fs.truncate("./node/articles.json", 0, function() {
+  //   fs.writeFile("./node/articles.json", JSON.stringify(articles), function (err) {
+  //       if (err) {
+  //           return console.log("Error writing file: " + err);
+  //       }
+  //       res.status(204).send();
+  //       console.log('Done');
+  //   });
+  // });
+
+  Article.findOneAndRemove({ id: num },
+    function (err) {
+      if (err) throw err;
+      console.log('User deleted!');
+    }
+  )
+
 });
 
 app.use(function(req, res) {
   throw new Error("Page Not Found Sorry");
 });
 
+app.use(logErrors);
+app.use(clientErrorHandler);
+app.use(errorHandler);
 
-
-app.use(function(err, req, res, next) {
+function logErrors (err, req, res, next) {
+  console.error(err.stack);
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  //  res.writeHead(404, {'Content-Type': 'text/html'});
   res.statusCode = 404;
   res.setHeader('Content-Type', 'text/html');
   logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+  next(err);
+};
 
-  //res.status(404).send("Page Not Found Sorry");
+function clientErrorHandler (err, req, res, next) {
+  if (req.xhr) {
+    res.status(err.status || 404);
+    res.send({ error: 'Something failed!' })
+  } else {
+    next(err)
+  }
+};
+
+function errorHandler (err, req, res, next) {
   res.status(err.status || 404);
   res.render('error', { title: 'Error', message: err.message });
-});
+};
