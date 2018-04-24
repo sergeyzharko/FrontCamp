@@ -1,10 +1,13 @@
 var express = require('express');
 var http = require('http');
-var articles = require('./articles');
+// var articles = require('./articles');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var logger = require('./config/winston');
 var mongoose = require('mongoose');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var path = require("path");
 
 mongoose.connect('mongodb://127.0.0.1/blogs');
 
@@ -22,7 +25,14 @@ var blogSchema = new Schema({
 	date: { type: Date, default: Date.now }
 });
 
-var Article = db.model('Article', blogSchema);
+var Article = db.model('Article', blogSchema); // коллекция articles
+
+var userSchema = new Schema({
+  username: String,
+  password: String
+});
+
+var User = db.model('User', userSchema);
 
 // let articles = [{ id: 1, name: 'Article', body: 'Hello' }];
 
@@ -39,7 +49,41 @@ http.createServer(app).listen(app.get('port'), function(){
 
 // Middleware
 
-app.get('/blogs', function (req, res, next) {
+// app.use(passport.initialize());
+// app.use(passport.session());
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    User.findOne({ username: username }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (user.password != password) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user); // добавится в запрос, параметр user
+    });
+  }
+));
+
+app.get('/',function(req,res){ 
+  res.sendFile(path.join(__dirname+'/html/index.html'));
+});
+
+app.get('/login',function(req,res){ 
+  res.sendFile(path.join(__dirname+'/html/login.html'));
+});
+
+app.post('/login',
+  passport.authenticate('local', { successRedirect: '/blogs',
+                                   failureRedirect: '/login',
+                                   session: false })
+);
+
+app.get('/blogs',
+// protect endpoint with bearer strategy
+  function (req, res, next) {
 
   app.get('/blogs', function (req, res) {
     Article.find(function (err, blogs) {
@@ -99,7 +143,19 @@ app.use(function(req, res, next) {
 
 app.get('/view', function (req, res) {
   res.render('index', { title: 'Hey', message: 'Hello there!' })
-})
+});
+
+app.post('/registration', function (req, res) {
+  const user = req.body;
+  var newUser = new User(user);
+  newUser.save(function (err, user) {
+    if (err) return console.error("Error writing: " + err);
+    // next(new Error("Error writing: " + err)); // Express regards the current request as being an error
+  });
+  res.status(204).send();
+  console.log('New user');
+
+});
 
 app.post('/blogs', function (req, res) {
   const blogs = req.body;

@@ -189,3 +189,5 @@ npm install pug --save
 
 npm install mongodb --save
 npm install mongoose --save
+npm install passport --save
+npm install passport-local --save
