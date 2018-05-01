@@ -191,3 +191,7 @@ npm install mongodb --save
 npm install mongoose --save
 npm install passport --save
 npm install passport-local --save
+npm install ejs --save
+npm install nconf --save
+
+sudo service mongod start
