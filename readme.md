@@ -195,3 +195,12 @@ npm install ejs --save
 npm install nconf --save
 
 sudo service mongod start
+nodemon node/app
+
+
+8. ReactJS
+
+npm i -D webpack webpack-dev-server babel-core babel-loader babel-preset-react react-hot-loader
+
+npm i react react-dom
+npm install babel-preset-react

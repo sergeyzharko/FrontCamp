@@ -1,14 +1,13 @@
 {
-  "name": "news",
+  "name": "blog",
   "version": "1.0.0",
   "description": "",
   "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --open --env dev --config ./webpack/webpack.config.js",
     "build": "webpack --env prod --config ./webpack/webpack.config.js",
-    "buildnode": "webpack --env prod --config ./node/webpack/webpack.config.js",
-    "start": "nodemon node/dist/server"
+    "dev": "webpack --env prod --config ./webpack/webpack.config.js  --watch",
+    "start": "nodemon dist/server"
   },
   "author": "Sergey Zharko",
   "license": "ISC",

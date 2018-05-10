@@ -1,6 +1,11 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var HttpError = require("../errors").HttpError;
+// var ReactDOMServer = require("react-dom/server");
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+import App from '../client/App';
+import Html from '../client/Html';
 
 module.exports = function(app, Article) {
 
@@ -20,9 +25,22 @@ module.exports = function(app, Article) {
       ));
 
     app.get('/', function(req, res, next) {
-        res.render('main.ejs', {
-        title: 'Hello'
-        });
+
+        const body = renderToString(<App />);
+        const title = 'Server side Rendering with Styled Components';
+
+        res.send(
+            Html({
+            body,
+            title
+            })
+        );
+
+
+        // res.render('main.ejs', {
+        // title: 'Hello'
+        // });
+
     });
     
     app.get('/login',function(req,res){ 

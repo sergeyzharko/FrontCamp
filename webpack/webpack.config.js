@@ -7,6 +7,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const package = require('../package.json');
 const filelist = require('./filelist.js');
 const customLoader = require('./customLoader.js');
+const nodeExternals = require('webpack-node-externals');
 var isProd;
 
 module.exports = (env = {}) => {

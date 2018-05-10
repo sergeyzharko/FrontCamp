@@ -10,6 +10,8 @@ var errors = require("./errors");
 var errorhandler = require('errorhandler');
 var config = require("./config");
 
+
+
 mongoose.connect('mongodb://127.0.0.1/blogs');
 
 var db = mongoose.connection;
