@@ -54,7 +54,7 @@ module.exports = (env = {}) => {
                         //"./plugin.js", // выключать на DEV
                         "syntax-dynamic-import"
                         ]
-                }
+                    }
                 },
                 {
                     test: /\.(s*)css$/,

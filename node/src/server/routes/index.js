@@ -4,8 +4,9 @@ var HttpError = require("../errors").HttpError;
 // var ReactDOMServer = require("react-dom/server");
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import App from '../client/App';
-import Html from '../client/Html';
+import App from '../../client/App';
+import Html from '../../client/Html';
+import { ServerStyleSheet } from 'styled-components';
 
 module.exports = function(app, Article) {
 
@@ -26,15 +27,19 @@ module.exports = function(app, Article) {
 
     app.get('/', function(req, res, next) {
 
-        const body = renderToString(<App />);
+        const sheet = new ServerStyleSheet(); // <-- creating out stylesheet
+
+        const body = renderToString(sheet.collectStyles(<App />)); // <-- collecting styles
+        const styles = sheet.getStyleTags(); // <-- getting all the tags from the sheet
         const title = 'Server side Rendering with Styled Components';
 
         res.send(
             Html({
             body,
+            styles, // <-- passing the styles to our Html template
             title
             })
-        );
+  );
 
 
         // res.render('main.ejs', {

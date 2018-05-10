@@ -1,12 +1,15 @@
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const path = require('path');
+const CleanWebpackPlugin = require("clean-webpack-plugin");
+
+const outputDirectory = "../dist";
 
 module.exports = {
   entry: './src/server.js',
   output: {
-    path: path.resolve(__dirname, '../dist'),
-    filename: 'server.js',
+    path: path.resolve(__dirname, outputDirectory),
+    filename: 'bundle.js',
     publicPath: '/'
   },
   target: 'node',
@@ -19,23 +22,29 @@ module.exports = {
     })
   ],
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
-        loader: 'babel-loader'
-      },
-      { 
-        test: /\.jsx?$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              presets: ['react']
-            }
-          }
-        ],
+        loader: 'babel-loader',
+        options: {
+          "presets": ["env", "react"]
+        }
+      },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"]
       }
     ]
-  }
+  },
+  devServer: {
+    port: 3000,
+    open: true,
+    proxy: {
+      "/api": "http://localhost:8080"
+    }
+  },
+  plugins: [
+    new CleanWebpackPlugin([outputDirectory])
+  ]
 };

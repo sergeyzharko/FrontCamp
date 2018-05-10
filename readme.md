@@ -204,3 +204,7 @@ npm i -D webpack webpack-dev-server babel-core babel-loader babel-preset-react r
 
 npm i react react-dom
 npm install babel-preset-react
+npm i clean-webpack-plugin --save-dev
+npm i concurrently --save-dev
+npm i styled-components --save-dev
+npm i wait-on --save-dev
