@@ -1,7 +1,6 @@
 import express from 'express';
 var http = require('http');
 // var articles = require('./articles');
-var bodyParser = require('body-parser');
 var fs = require('fs');
 var logger = require('./config/winston');
 var path = require("path");
@@ -20,11 +19,10 @@ var app = express();
 app.set('port', 3000);
 app.set('views', './node/views');
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded());
-app.use(bodyParser.json());
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 // Middlewares, которые должны быть определены до passport:
 app.use(cookieParser());
-app.use(bodyParser());
 app.use(session({
       secret: 'secret',
       resave: true,
@@ -46,7 +44,11 @@ http.createServer(app).listen(app.get('port'), function(){
 
 require('./routes')(app);
 
-app.use(express.static(path.join(__dirname, 'html'))); // выдача статического файла
+app.use(express.static(path.join(__dirname, 'static'))); // выдача статического файла
+
+app.use(function(req, res) {
+    throw new Error("Page Not Found Sorry");
+});
 
 app.use(function(err, req, res, next) {
   if (typeof err == 'number') { // next(404)

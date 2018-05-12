@@ -351,9 +351,9 @@ module.exports = function(app) {
     
     });
     
-    app.use(function(req, res) {
-        throw new Error("Page Not Found Sorry");
-    });
+    // app.use(function(req, res) {
+    //     throw new Error("Page Not Found Sorry");
+    // });
 
 
 
