@@ -191,6 +191,7 @@ npm install mongodb --save
 npm install mongoose --save
 npm install passport --save
 npm install passport-local --save
+npm install passport-local-mongoose --save
 npm install ejs --save
 npm install nconf --save
 
@@ -208,3 +209,6 @@ npm i clean-webpack-plugin --save-dev
 npm i concurrently --save-dev
 npm i styled-components --save-dev
 npm i wait-on --save-dev
+
+npm i cookie-parser --save-dev
+npm i express-session --save-dev

@@ -4,38 +4,15 @@ var http = require('http');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var logger = require('./config/winston');
-var mongoose = require('mongoose');
 var path = require("path");
 var errors = require("./errors");
 var errorhandler = require('errorhandler');
-var config = require("./config");
+// var config = require("./config");
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
 
 
 
-mongoose.connect('mongodb://127.0.0.1/blogs');
-
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() { console.log('Database has been connected!') });
-
-var Schema = mongoose.Schema;
-
-var blogSchema = new Schema({
-  id: Number,
-	title: String,
-	author: String,
-	body: { type: String, required: [true, 'Where is the body?']},
-	date: { type: Date, default: Date.now }
-});
-
-var Article = db.model('Article', blogSchema); // коллекция articles
-
-var userSchema = new Schema({
-  username: String,
-  password: String
-});
-
-var User = db.model('User', userSchema);
 
 // let articles = [{ id: 1, name: 'Article', body: 'Hello' }];
 
@@ -45,6 +22,14 @@ app.set('views', './node/views');
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
+// Middlewares, которые должны быть определены до passport:
+app.use(cookieParser());
+app.use(bodyParser());
+app.use(session({
+      secret: 'secret',
+      resave: true,
+      saveUninitialized: true
+  }));
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
@@ -59,7 +44,7 @@ http.createServer(app).listen(app.get('port'), function(){
   // res.sendFile(path.join(__dirname+'/html/index.html'));
 // });
 
-require('./routes')(app, Article);
+require('./routes')(app);
 
 app.use(express.static(path.join(__dirname, 'html'))); // выдача статического файла
 

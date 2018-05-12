@@ -6,24 +6,74 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import App from '../../client/App';
 import Html from '../../client/Html';
+import Login from '../../client/Login';
+import Registration from '../../client/Registration';
+import Blogs from '../../client/Blogs';
 import { ServerStyleSheet } from 'styled-components';
+const path = require('path');
+var mongoose = require('mongoose');
+var passportLocalMongoose = require('passport-local-mongoose');
+var User = require('../models/User');
+var Article = require('../models/Article');
+var auth = require("../controllers/AuthController.js");
+// console.log(User);
+// console.log(Article);
 
-module.exports = function(app, Article) {
+module.exports = function(app) {
 
-    passport.use(new LocalStrategy(
-        function(username, password, done) {
-          User.findOne({ username: username }, function(err, user) {
-            if (err) { return done(err); }
-            if (!user) {
-              return done(null, false, { message: 'Incorrect username.' });
-            }
-            if (user.password != password) {
-              return done(null, false, { message: 'Incorrect password.' });
-            }
-            return done(null, user); // добавится в запрос, параметр user
-          });
-        }
-      ));
+    mongoose.connect('mongodb://127.0.0.1/blogs');
+
+    var db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'connection error:'));
+    db.once('open', function() { console.log('Database has been connected!') });
+
+
+    app.use(passport.initialize());
+    app.use(passport.session());
+
+    passport.use(new LocalStrategy(User.authenticate()));
+    passport.serializeUser(User.serializeUser()); // сохранить данные в сессию
+    passport.deserializeUser(User.deserializeUser()); // достать данные из сессии
+
+    // passport.use(new LocalStrategy(
+    //     function(username, password, done) {
+    //       User.findOne({ username: username }, function(err, user) {
+    //         if (err) { return done(err); }
+    //         if (!user) {
+    //           return done(null, false, { message: 'Incorrect username.' });
+    //         }
+    //         if (user.password != password) {
+    //           return done(null, false, { message: 'Incorrect password.' });
+    //         }
+    //         return done(null, user); // добавится в запрос, параметр user
+    //       });
+    //     }
+    //   ));
+
+    // passport.serializeUser(function(user, done) { // сохранить данные в сессию
+    //     done(null, user.id);
+    // });
+    
+    
+    // passport.deserializeUser(function(id, done) { // достать данные из сессии
+    //     User.findById(id, function(err,user){
+    //         err 
+    //             ? done(err)
+    //             : done(null,user);
+    //     });
+    // });
+
+    var mustAuthenticatedMw = function (req, res, next){
+        console.log(req.isAuthenticated());
+        req.isAuthenticated()
+          ? next()
+          : res.redirect('/login');
+      };
+
+    // app.all('/blogs', mustAuthenticatedMw);
+    // app.all('/blogs/*', mustAuthenticatedMw);
+    // app.all('/users', mustAuthenticatedMw);
+    // app.all('/users/*', mustAuthenticatedMw);
 
     app.get('/', function(req, res, next) {
 
@@ -39,7 +89,7 @@ module.exports = function(app, Article) {
             styles, // <-- passing the styles to our Html template
             title
             })
-  );
+        );
 
 
         // res.render('main.ejs', {
@@ -49,21 +99,89 @@ module.exports = function(app, Article) {
     });
     
     app.get('/login',function(req,res){ 
-        res.sendFile(path.join(__dirname+'/html/login.html'));
+
+        const sheet = new ServerStyleSheet(); // <-- creating out stylesheet
+
+        const body = renderToString(sheet.collectStyles(<Login />)); // <-- collecting styles
+        const styles = sheet.getStyleTags(); // <-- getting all the tags from the sheet
+        const title = 'Server side Rendering with Styled Components';
+
+        res.send(
+            Html({
+            body,
+            styles, // <-- passing the styles to our Html template
+            title
+            })
+        );
+
+        // res.sendFile(path.join(__dirname+'/html/login.html'));
     });
     
     app.post('/login',
-        passport.authenticate('local', { successRedirect: '/blogs',
-                                        failureRedirect: '/login',
-                                        session: false })
+        function(req, res) {
+            passport.authenticate('local')(req, res, function () {
+              res.redirect('/blogs');
+            });
+          }
     );
-    
+
+//     app.post('/login',
+//     function (req, res, next) {
+//         passport.authenticate('local',
+//         function(err, user, info) {
+//         return err 
+//             ? next(err)
+//             : user
+//             ? req.logIn(user, function(err) {
+//                 return err
+//                     ? next(err)
+//                     : res.redirect('/blogs');
+//                 })
+//             : res.redirect('/registration');
+//         })
+//     }
+// );
+
     app.get('/blogs',
     // protect endpoint with bearer strategy
+    
         function (req, res, next) {
-        Article.find(function (err, blogs) {
+            Article.find(function (err, blogs) {
+                if (err) return console.error(err);
+                // res.json(blogs);
+
+                const sheet = new ServerStyleSheet(); // <-- creating out stylesheet
+
+                const body = renderToString(sheet.collectStyles(<Blogs />)); // <-- collecting styles
+                const styles = sheet.getStyleTags(); // <-- getting all the tags from the sheet
+                const title = 'Blogs';
+        
+                res.send(
+                    Html({
+                    body,
+                    styles, // <-- passing the styles to our Html template
+                    title
+                    })
+                );
+
+
+            })
+        });
+
+    app.get('/logout',
+        function (req, res, next) {
+            req.logout();
+            res.redirect('/');
+        }
+    );
+
+    app.get('/users',
+    // protect endpoint with bearer strategy
+    
+        function (req, res, next) {
+        User.find(function (err, users) {
             if (err) return console.error(err);
-            res.json(blogs);
+            res.json(users);
         })
     });
     
@@ -116,17 +234,42 @@ module.exports = function(app, Article) {
     app.get('/view', function (req, res) {
         res.render('index', { title: 'Hey', message: 'Hello there!' })
     });
+
+    app.get('/registration', function (req, res) {
+
+        const sheet = new ServerStyleSheet(); // <-- creating out stylesheet
+
+        const body = renderToString(sheet.collectStyles(<Registration />)); // <-- collecting styles
+        const styles = sheet.getStyleTags(); // <-- getting all the tags from the sheet
+        const title = 'Server side Rendering with Styled Components';
+
+        res.send(
+            Html({
+            body,
+            styles, // <-- passing the styles to our Html template
+            title
+            })
+        );
+
+        // res.sendFile(path.join(__dirname+'/html/login.html'));
+    });
     
     app.post('/registration', function (req, res) {
         const user = req.body;
-        var newUser = new User(user);
-        newUser.save(function (err, user) {
-        if (err) return console.error("Error writing: " + err);
-        // next(new Error("Error writing: " + err)); // Express regards the current request as being an error
-        });
-        res.status(204).send();
-        console.log('New user');
-    
+
+            var newUser = new User({
+                username : user.username
+            });
+        
+            User.register(newUser, user.password, function(err, user) {
+                if (err) {
+                    // handle the error
+                }
+                passport.authenticate("local")(req, res, function() {
+                    res.redirect('/blogs');
+                });
+            });
+
     });
     
     app.post('/blogs', function (req, res) {
@@ -147,8 +290,8 @@ module.exports = function(app, Article) {
     
         var article = new Article(blogs);
         article.save(function (err, article) {
-        if (err) return console.error("Error writing: " + err);
-        next(new Error("Error writing: " + err)); // Express regards the current request as being an error
+            if (err) return console.error("Error writing: " + err);
+            next(new Error("Error writing: " + err)); // Express regards the current request as being an error
         });
         res.status(204).send();
         console.log('Done');
@@ -211,5 +354,9 @@ module.exports = function(app, Article) {
     app.use(function(req, res) {
         throw new Error("Page Not Found Sorry");
     });
+
+
+
+
 
 }
