@@ -16,8 +16,6 @@ var passportLocalMongoose = require('passport-local-mongoose');
 var User = require('../models/User');
 var Article = require('../models/Article');
 var auth = require("../controllers/AuthController.js");
-// console.log(User);
-// console.log(Article);
 
 module.exports = function(app) {
 
@@ -35,40 +33,13 @@ module.exports = function(app) {
     passport.serializeUser(User.serializeUser()); // сохранить данные в сессию
     passport.deserializeUser(User.deserializeUser()); // достать данные из сессии
 
-    // passport.use(new LocalStrategy(
-    //     function(username, password, done) {
-    //       User.findOne({ username: username }, function(err, user) {
-    //         if (err) { return done(err); }
-    //         if (!user) {
-    //           return done(null, false, { message: 'Incorrect username.' });
-    //         }
-    //         if (user.password != password) {
-    //           return done(null, false, { message: 'Incorrect password.' });
-    //         }
-    //         return done(null, user); // добавится в запрос, параметр user
-    //       });
-    //     }
-    //   ));
-
-    // passport.serializeUser(function(user, done) { // сохранить данные в сессию
-    //     done(null, user.id);
-    // });
-    
-    
-    // passport.deserializeUser(function(id, done) { // достать данные из сессии
-    //     User.findById(id, function(err,user){
-    //         err 
-    //             ? done(err)
-    //             : done(null,user);
-    //     });
-    // });
 
     var mustAuthenticatedMw = function (req, res, next){
         console.log(req.isAuthenticated());
         req.isAuthenticated()
           ? next()
           : res.redirect('/login');
-      };
+    };
 
     // app.all('/blogs', mustAuthenticatedMw);
     // app.all('/blogs/*', mustAuthenticatedMw);
@@ -124,23 +95,6 @@ module.exports = function(app) {
             });
           }
     );
-
-//     app.post('/login',
-//     function (req, res, next) {
-//         passport.authenticate('local',
-//         function(err, user, info) {
-//         return err 
-//             ? next(err)
-//             : user
-//             ? req.logIn(user, function(err) {
-//                 return err
-//                     ? next(err)
-//                     : res.redirect('/blogs');
-//                 })
-//             : res.redirect('/registration');
-//         })
-//     }
-// );
 
     app.get('/blogs',
     // protect endpoint with bearer strategy
@@ -351,9 +305,7 @@ module.exports = function(app) {
     
     });
     
-    // app.use(function(req, res) {
-    //     throw new Error("Page Not Found Sorry");
-    // });
+
 
 
 

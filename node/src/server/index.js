@@ -1,6 +1,5 @@
 import express from 'express';
 var http = require('http');
-// var articles = require('./articles');
 var fs = require('fs');
 var logger = require('./config/winston');
 var path = require("path");
@@ -10,18 +9,12 @@ var errorhandler = require('errorhandler');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
-
-
-
-// let articles = [{ id: 1, name: 'Article', body: 'Hello' }];
-
 var app = express();
 app.set('port', 3000);
 app.set('views', './node/views');
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-// Middlewares, которые должны быть определены до passport:
 app.use(cookieParser());
 app.use(session({
       secret: 'secret',
@@ -32,15 +25,6 @@ app.use(session({
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
-
-// Middleware
-
-// app.use(passport.initialize());
-// app.use(passport.session());
-
-// app.get('/',function(req,res){ 
-  // res.sendFile(path.join(__dirname+'/html/index.html'));
-// });
 
 require('./routes')(app);
 
