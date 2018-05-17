@@ -13,7 +13,7 @@ const AppContaienr = styled.div`
   background: linear-gradient(20deg, rgb(219, 112, 147), #daa357);
 `;
 
-const App = () => { return <AppContaienr>
+const App = () => { return ( <AppContaienr>
     Welcome!
     <ul>
     <li><a href="login">Login</a></li>
@@ -21,7 +21,7 @@ const App = () => { return <AppContaienr>
     <li><a href="registration">Registration</a></li>
     <li><a href="blogs">Blogs</a></li>
     </ul>
-  </AppContaienr>
+</AppContaienr> );
 };
 
 export default App;

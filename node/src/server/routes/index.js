@@ -3,6 +3,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var HttpError = require("../errors").HttpError;
 // var ReactDOMServer = require("react-dom/server");
 import React from 'react';
+var ReactDOMServer = require('react-dom/server');
 import { renderToString } from 'react-dom/server';
 import App from '../../client/App';
 import Html from '../../client/Html';
@@ -50,17 +51,20 @@ module.exports = function(app) {
 
         const sheet = new ServerStyleSheet(); // <-- creating out stylesheet
 
-        const body = renderToString(sheet.collectStyles(<App />)); // <-- collecting styles
+        const body = ReactDOMServer.renderToString(sheet.collectStyles(<App />)); // <-- collecting styles
         const styles = sheet.getStyleTags(); // <-- getting all the tags from the sheet
         const title = 'Server side Rendering with Styled Components';
 
+        const props = {
+            body: body,
+            styles: styles,
+            title: title
+        }
+
         res.send(
-            Html({
-            body,
-            styles, // <-- passing the styles to our Html template
-            title
-            })
+            Html(props)
         );
+
 
 
         // res.render('main.ejs', {
@@ -77,12 +81,14 @@ module.exports = function(app) {
         const styles = sheet.getStyleTags(); // <-- getting all the tags from the sheet
         const title = 'Server side Rendering with Styled Components';
 
+        const props = {
+            body: body,
+            styles: styles,
+            title: title
+        }
+
         res.send(
-            Html({
-            body,
-            styles, // <-- passing the styles to our Html template
-            title
-            })
+            Html(props)
         );
 
         // res.sendFile(path.join(__dirname+'/html/login.html'));
@@ -106,7 +112,7 @@ module.exports = function(app) {
 
                 const sheet = new ServerStyleSheet(); // <-- creating out stylesheet
 
-                const body = renderToString(sheet.collectStyles(<Blogs />)); // <-- collecting styles
+                const body = renderToString(sheet.collectStyles(<Blogs initialData = {blogs} />)); // <-- collecting styles
                 const styles = sheet.getStyleTags(); // <-- getting all the tags from the sheet
                 const title = 'Blogs';
         
@@ -304,11 +310,5 @@ module.exports = function(app) {
         )
     
     });
-    
-
-
-
-
-
 
 }

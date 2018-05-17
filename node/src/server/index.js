@@ -10,7 +10,7 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
 var app = express();
-app.set('port', 3000);
+app.set('port', process.env.PORT || 3000);
 app.set('views', './node/views');
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));

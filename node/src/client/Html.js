@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Header from './Header';
+import Header from './Header.jsx';
 import Footer from './Footer';
 /**
  * Html
@@ -7,11 +7,11 @@ import Footer from './Footer';
  * application strings into before sending it to the client.
  */
 const Html = ({ body, styles, title }) => `
-  <!DOCTYPE html>  
   <html>
     <head>
       <title>${title}</title>
       ${styles}
+      <link rel='stylesheet' href='/style.css' />
     </head>
     ${Header}
     <body style="margin:0">
@@ -20,5 +20,6 @@ const Html = ({ body, styles, title }) => `
     ${Footer}
   </html>
 `;
+
 
 export default Html;
