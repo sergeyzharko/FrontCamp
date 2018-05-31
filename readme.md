@@ -212,3 +212,4 @@ npm i wait-on --save-dev
 
 npm i cookie-parser --save-dev
 npm i express-session --save-dev
+npm i extract-text-webpack-plugin --save-dev

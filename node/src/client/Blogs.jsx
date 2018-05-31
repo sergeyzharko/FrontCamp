@@ -35,7 +35,7 @@
 
 
 import React, { Component } from "react";
-import BlogsList from "./BlogsList";
+import BlogsList from "./BlogsList.jsx";
 
 class Blogs extends Component {
   constructor(props) {
