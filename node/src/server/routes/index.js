@@ -42,10 +42,10 @@ module.exports = function(app) {
           : res.redirect('/login');
     };
 
-    // app.all('/blogs', mustAuthenticatedMw);
-    // app.all('/blogs/*', mustAuthenticatedMw);
-    // app.all('/users', mustAuthenticatedMw);
-    // app.all('/users/*', mustAuthenticatedMw);
+    app.all('/blogs', mustAuthenticatedMw);
+    app.all('/blogs/*', mustAuthenticatedMw);
+    app.all('/users', mustAuthenticatedMw);
+    app.all('/users/*', mustAuthenticatedMw);
 
     app.get('/', function(req, res, next) {
 
@@ -104,15 +104,22 @@ module.exports = function(app) {
 
     app.get('/blogs',
     // protect endpoint with bearer strategy
-    
+    // passport.authenticate('local'),
         function (req, res, next) {
             Article.find(function (err, blogs) {
                 if (err) return console.error(err);
                 // res.json(blogs);
+                
+                let min = blogs[0].id;
+                let max = min;
+                for (let i = 1; i < blogs.length; ++i) {
+                    if (blogs[i].id > max) max = blogs[i].id;
+                    if (blogs[i].id < min) min = blogs[i].id;
+                }
 
                 const sheet = new ServerStyleSheet(); // <-- creating out stylesheet
 
-                const body = renderToString(sheet.collectStyles(<Blogs initialData = {blogs} />)); // <-- collecting styles
+                const body = renderToString(sheet.collectStyles(<Blogs initialData = {blogs} name = {req.user.username} maxId = {max} />)); // <-- collecting styles
                 const styles = sheet.getStyleTags(); // <-- getting all the tags from the sheet
                 const title = 'Blogs';
         
@@ -232,7 +239,7 @@ module.exports = function(app) {
 
     });
     
-    app.post('/blogs', function (req, res) {
+    app.post('/blogs', function (req, res, next) {
         const blogs = req.body;
     
         // articles.push(blogs);
@@ -250,11 +257,10 @@ module.exports = function(app) {
     
         var article = new Article(blogs);
         article.save(function (err, article) {
-            if (err) return console.error("Error writing: " + err);
-            next(new Error("Error writing: " + err)); // Express regards the current request as being an error
+            if (err) next(new Error("Error writing: " + err)); // Express regards the current request as being an error
         });
-        res.status(204).send();
-        console.log('Done');
+        // res.status(204).send();
+        res.redirect('/blogs');
     
     });
     

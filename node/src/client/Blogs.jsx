@@ -40,13 +40,16 @@ import BlogsList from "./BlogsList.jsx";
 class Blogs extends Component {
   constructor(props) {
     super(props);
-    let initialData = props.initialData;
-    this.state = { blogs: initialData };
+    this.state = { blogs: props.initialData };
+    this.name = { name: props.name };
+    this.maxId = { maxId: props.maxId };
   }
 
   render() {
     const { blogs } = this.state;
-    return <BlogsList blogs={blogs} />;
+    const {name} = this.name;
+    const {maxId} = this.maxId;
+    return <BlogsList blogs={blogs} name={name} maxId={maxId} />;
   }
 }
 
