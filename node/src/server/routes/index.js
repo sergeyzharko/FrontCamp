@@ -36,7 +36,7 @@ module.exports = function(app) {
 
 
     var mustAuthenticatedMw = function (req, res, next){
-        console.log(req.isAuthenticated());
+        console.log('Authentification: ' + req.isAuthenticated());
         req.isAuthenticated()
           ? next()
           : res.redirect('/login');
@@ -110,11 +110,14 @@ module.exports = function(app) {
                 if (err) return console.error(err);
                 // res.json(blogs);
                 
-                let min = blogs[0].id;
+                let min = 0;
                 let max = min;
-                for (let i = 1; i < blogs.length; ++i) {
-                    if (blogs[i].id > max) max = blogs[i].id;
-                    if (blogs[i].id < min) min = blogs[i].id;
+                if (blogs.length > 0) {
+                    min = blogs[0].id;
+                    for (let i = 1; i < blogs.length; ++i) {
+                        if (blogs[i].id > max) max = blogs[i].id;
+                        if (blogs[i].id < min) min = blogs[i].id;
+                    }
                 }
 
                 const sheet = new ServerStyleSheet(); // <-- creating out stylesheet
