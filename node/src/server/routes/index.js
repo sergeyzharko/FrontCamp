@@ -36,16 +36,16 @@ module.exports = function(app) {
 
 
     var mustAuthenticatedMw = function (req, res, next){
-        console.log('Authentification: ' + req.isAuthenticated());
+        // console.log('Authentification: ' + req.isAuthenticated());
         req.isAuthenticated()
           ? next()
           : res.redirect('/login');
     };
 
-    app.all('/blogs', mustAuthenticatedMw);
-    app.all('/blogs/*', mustAuthenticatedMw);
-    app.all('/users', mustAuthenticatedMw);
-    app.all('/users/*', mustAuthenticatedMw);
+    // app.all('/blogs', mustAuthenticatedMw);
+    // app.all('/blogs/*', mustAuthenticatedMw);
+    // app.all('/users', mustAuthenticatedMw);
+    // app.all('/users/*', mustAuthenticatedMw);
 
     app.get('/', function(req, res, next) {
 
@@ -174,7 +174,8 @@ module.exports = function(app) {
                 console.log(blog);
                 res.json(blog);
             })
-        });
+        }
+    );
     
     // app.use(function(req, res, next) {
     //   if (req.url == '/blogs') {
@@ -260,7 +261,7 @@ module.exports = function(app) {
     
         var article = new Article(blogs);
         article.save(function (err, article) {
-            if (err) next(new Error("Error writing: " + err)); // Express regards the current request as being an error
+            if (err) next(new Error("Error posting: " + err)); // Express regards the current request as being an error
         });
         // res.status(204).send();
         res.redirect('/blogs');
@@ -291,8 +292,9 @@ module.exports = function(app) {
         submission.body = article.body;
         submission.date = article.date;
         Article.findOneAndUpdate({ id: num }, submission, function (err, article) {
-        if (err) return console.error(err);
+            if (err) next(new Error("Error putting: " + err));
         });
+        res.redirect('/blogs');
     
     });
     
@@ -313,10 +315,11 @@ module.exports = function(app) {
     
         Article.findOneAndRemove({ id: num },
         function (err) {
-            if (err) throw err;
-            console.log('User deleted!');
+            if (err) next(new Error("Error removing: " + err));
         }
         )
+        console.log('Article deleted!');
+        res.redirect('/blogs');
     
     });
 
