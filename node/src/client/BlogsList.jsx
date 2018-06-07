@@ -3,14 +3,31 @@ import React, { Component } from "react";
 
 class NewsList extends Component {
 
+  constructor(props){
+    super(props);
+    this.handleCheck = this.handleCheck.bind(this);
+    this.state = {counter: 0}
+  }
+
+  handleCheck () {
+    console.log('check');
+    this.setState({counter: this.state.counter + 1})
+  }
+
   render() {
     const blogs = this.props.blogs;
     const name = this.props.name;
     const maxId = this.props.maxId;
     // console.log(maxId);
 
+    function handleCheck () {
+      console.log('check');
+      this.setState({counter: this.state.counter + 1})
+    }
+
     return (
       <div>
+        <button onClick={this.handleCheck}>Already clicked {this.state.counter} times!</button>
         <table className='customers'>
             <thead>
                 <th>ID</th>
