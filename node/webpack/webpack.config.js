@@ -8,6 +8,7 @@ const outputDirectory = "../dist";
 
 module.exports = {
   entry: './src/server/index',
+  mode: "development",
   output: {
     path: path.resolve(__dirname, outputDirectory),
     filename: 'bundle.js',
